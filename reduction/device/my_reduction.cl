@@ -41,7 +41,9 @@ void reduction_NDRange(__global int * restrict x, __global int * restrict res, i
 	if (tid == 0) res[0] = buffer[0] + buffer[1];
 }
 
-__attribute__((task)) kernel
+__attribute__((task)) 
+__attribute__((num_compute_units(PARA_TASKS)))
+kernel
 void reduction_task(
 	__global int * restrict x,   int x_offset,
 	__global int * restrict res, int res_offset, int length
