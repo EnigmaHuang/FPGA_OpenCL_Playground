@@ -14,7 +14,7 @@ void reduction_NDRange(__global int * restrict x, __global int * restrict res, i
 	int nstep = length / WG_SIZE;
 	int idx   = tid;
 	
-	int sum = 0.0;
+	int sum = 0;
 	#pragma unroll 4
 	for (int i = 0; i < nstep; i++)
 	{
@@ -41,3 +41,19 @@ void reduction_NDRange(__global int * restrict x, __global int * restrict res, i
 	if (tid == 0) res[0] = buffer[0] + buffer[1];
 }
 
+__attribute__((task)) kernel
+void reduction_task(
+	__global int * restrict x,   int x_offset,
+	__global int * restrict res, int res_offset, int length
+)
+{
+	int sum = 0;
+	
+	for (int i = 0; i < length; i++)
+	{
+		int xi = x[x_offset + i];
+		sum += xi;
+	}
+	
+	res[res_offset] = sum;
+}
