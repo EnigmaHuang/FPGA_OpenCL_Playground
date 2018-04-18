@@ -1,4 +1,3 @@
-//For clarity,error checking has been omitted.
 #include <CL/cl.h>
 #include <string.h>
 #include <stdio.h>
@@ -6,6 +5,7 @@
 #include <assert.h>
 
 #include "FPGA_OpenCL_utils.h"
+#include "../device/my_vector_add.h"
 
 int main(int argc, char **argv)
 {
@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 	cl_program program;
 	initCLFPGASimpleEnvironment(
 		&FPGA_devices, &numDevices, &context, 
-		&queue, &program, "vector_add.aocx"
+		&queue, &program, "my_vector_add.aocx"
 	);
 	
 	// OpenCL extra step 7: create kernel object

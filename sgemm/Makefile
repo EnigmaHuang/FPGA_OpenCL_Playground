@@ -17,15 +17,15 @@ LDFLAGS = -L/net/tools/reconfig/intel/17.1/hld/host/linux64/lib -lOpenCL
 INC     += -I./host
 LDFLAGS += -fopenmp
 
-OBJS  = bin/FPGA_OpenCL_utils.o bin/test_sgemm.o bin/main.o
-AOCXS = bin/my_sgemm.aocx
+OBJS = bin/FPGA_OpenCL_utils.o bin/test_sgemm.o bin/main.o
+AOCX = bin/my_sgemm.aocx
 
-all: $(EXE) $(AOCXS)
+all: $(EXE) $(AOCX)
 
-$(EXE): $(OBJS) $(AOCXS)
+$(EXE): $(OBJS) $(AOCX)
 	$(CXX) $(OPTFLAGS) $(OBJS) -o bin/$(EXE) $(LDFLAGS)
 	cp bin/$(EXE) ./
-	cp bin/my_sgemm.aocx ./
+	cp $(AOCX)    ./
 
 bin/my_sgemm.aocx: device/my_sgemm.cl
 	$(FPGA_CC) $(FPGA_CL_FLAGS) device/my_sgemm.cl -o bin/my_sgemm.aocx
@@ -40,4 +40,4 @@ bin/main.o: host/main.c host/test_sgemm.h host/FPGA_OpenCL_utils.h
 	$(CC)  $(CFLAGS)   $(INC) host/main.c -c -o bin/main.o
 	
 clean:
-	$(RM) $(OBJS) $(AOCXS) $(EXE)
+	$(RM) $(OBJS) $(AOCX) $(EXE)

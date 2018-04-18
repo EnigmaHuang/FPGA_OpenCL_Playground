@@ -94,5 +94,10 @@ int main(int argc, char **argv)
 	free(h_C);
 	free(C_ref);
 	
+	// Free device resources
+	clReleaseProgram(program);    // Release the program object
+	clReleaseCommandQueue(queue); // Release Command queue
+	clReleaseContext(context);    // Release context
+	
 	return 0;
 }
