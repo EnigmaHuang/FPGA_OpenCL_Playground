@@ -61,6 +61,7 @@ void sgemm_1_naive(KernelParameters)
 	C[globalRow * ldc + globalCol] = alpha * accu + beta * C[globalRow * ldc + globalCol];
 }
 
+#define POINTER_ALIAS_TEST
 
 __kernel
 __attribute((reqd_work_group_size(TILE_SIZE, TILE_SIZE, 1)))
@@ -77,20 +78,29 @@ void sgemm_2_tiling(KernelParameters)
 	
 	float accu = 0.0f;
 	
+	// Test pointer aliasing 
+	#ifdef POINTER_ALIAS_TEST
+	const __attribute__((address_space(16776960))) float *A_row = A + globalRow * lda;
+	#endif
+	
 	const unsigned int numTiles = common_dim / TILE_SIZE;
 	for (unsigned int t = 0; t < numTiles; t++) 
 	{
 		// Load one tile of A and B into local memory
 		const unsigned int tiledRow = TILE_SIZE * t + row;
 		const unsigned int tiledCol = TILE_SIZE * t + col;
+		#ifdef POINTER_ALIAS_TEST
+		Asub[row][col] = A_row[tiledCol];
+		#else
 		Asub[row][col] = A[globalRow * lda + tiledCol];
-		Bsub[row][col] = B[tiledRow * ldb + globalCol];
+		#endif
+		Bsub[col][row] = B[tiledRow * ldb + globalCol];
 		barrier(CLK_LOCAL_MEM_FENCE);
 		
 		// Accumulation 
 		#pragma unroll
 		for (unsigned int k = 0; k < TILE_SIZE; k++)
-			accu += Asub[row][k] * Bsub[k][col];
+			accu += Asub[row][k] * Bsub[col][k];
 		barrier(CLK_LOCAL_MEM_FENCE);
 	}
 	
